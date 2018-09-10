@@ -11,7 +11,8 @@ mkdirp(dir, err => {
 })
 
 const savePic = inf => new Promise((resolve, reject) => {
-  const targetPath = `${dir}/${inf.name.replace(':', '：')}.${inf.ext}`
+  const ext = inf.src.split('.').pop()
+  const targetPath = `${dir}/${inf.name.replace(':', '：')}.${ext}`
   const stream = fs.createWriteStream(targetPath)
   request(inf.src).pipe(stream).on('close', err => {
     if (err) {

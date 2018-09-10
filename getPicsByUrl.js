@@ -7,13 +7,35 @@ const getPics = async url => {
   
   const result = await sa.get(url).then(res => {
     const $ = c.load(res.text)
-    const pics = Array.from($('.picact'))
-    return pics.map((pic, index) => {
-      const src = pic.attribs.src
-      const ext = src.split('.').pop()
-      const name = (`${page}-${index + 1} ` + (pic.next && pic.next.next.data.replace(/\n/, ''))).replace(' null', '')
-      return { src, ext, name };
+    const pics = Array.from($('p[align="center"]'))
+    const picArr = []
+    
+    pics.forEach(child => {
+      if (child.children[0].type !== 'tag') return;
+
+      let src = ''
+      switch (child.children[0].name) {
+        case 'img':
+          src = child.children[0].attribs.src
+          break;
+        case 'a':
+          src = child.children[0].attribs.href
+          break;
+      }
+
+      let discription = child.children.pop()
+      if (discription.type === 'text') {
+        discription = discription.data
+      } else {
+        discription = ''
+      }
+      discription = discription || ''
+      discription = discription.replace(/(\n)|(\snull)/g, '')
+      const name = (`${page}-${picArr.length + 1} ` + discription).trim()
+
+      picArr.push({ src, name })
     })
+    return picArr;
   }).catch(err => [])
 
   return result;
