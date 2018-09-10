@@ -2,7 +2,7 @@ const fs = require('fs')
 const mkdirp = require('mkdirp')
 const request = require('request')
 
-const dir = './pic'
+const dir = './pic4'
 
 mkdirp(dir, err => {
   if (err) {

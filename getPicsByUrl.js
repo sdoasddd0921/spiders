@@ -19,7 +19,7 @@ const getPics = async url => {
           src = child.children[0].attribs.src
           break;
         case 'a':
-          src = child.children[0].attribs.href
+          src = child.children[0].attribs.href.split('?')[1]
           break;
       }
 

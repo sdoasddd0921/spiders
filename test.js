@@ -72,7 +72,7 @@ const test = async () => {
 // test()
 
 
-const dir = './pic'
+const dir = './test'
 
 mkdirp(dir, err => {
   if (err) {
@@ -85,7 +85,13 @@ const savePic = inf => new Promise((resolve, reject) => {
   const ext = inf.src.split('.').pop()
   const targetPath = `${dir}/${inf.name.replace(':', '：')}.${ext}`
   const stream = fs.createWriteStream(targetPath)
-  request(inf.src).pipe(stream).on('close', err => {
+  const options = {
+    url: inf.src,
+    headers: {
+      'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; QQDownload 627; TencentTraveler 4.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) )'
+    }
+  }
+  request(options).pipe(stream).on('close', err => {
     if (err) {
       console.log(err)
       reject(err)
