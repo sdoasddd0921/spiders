@@ -6,24 +6,19 @@ const { getPage } = require('./urlTools')
 let title = ''
 
 const getPics = async url => {
+  const picArr = []
   const page = getPage(url)
 
   const pageText = await sa.get(url)
     .then(res => res.text)
-    .catch(err => {
-      console.log(err)
-      return null;
-    })
-
-  if (!pageText) {
-    return [];
-  }
+    .catch(() => null)
+  if (!pageText) return picArr;
 
   const $ = c.load(pageText)
 
   // 检查本地目标文件夹是否存在
   if (title === '') {
-    const rawTitle = $('title')[0].children[0].data
+    const rawTitle = $('title').text()
     title = rawTitle.replace(' _ 游民星空 GamerSky.com', '')
 
     if (title.indexOf('囧图') !== -1) {
@@ -35,78 +30,32 @@ const getPics = async url => {
     await checkDir(title)
   }
 
-  const pics = Array.from($('.Mid2L_con>p'))
-  const picArr = []
+  let src = ''
+  const pTags = $('.Mid2L_con > p')
 
-  pics.forEach(child => {
-    if (child.children[0].type !== 'tag') return;
-
-    let src = ''
-
-    switch (child.children[0].name) {
-      case 'img':
-        src = child.children[0].attribs.src
-        break;
-      case 'a':
-        src = child.children[0].attribs.href.split('?').pop()
-        break;
-    }
-
-    let discription = child.children.pop()
-
-    if (discription.type === 'text') {
-      discription = discription.data
+  pTags.map((index, pTag) => {
+    const aTags = $(pTag).find('a')
+    // 因动态动图和静态图都有 img 标签，所以靠 a 标签区分
+    if (aTags.length > 0) {
+      // 真实图片地址为地址的参数
+      src = aTags.attr('href').split('?').pop()
     } else {
-      discription = ''
+      src = $(pTag).find('img').attr('src')
     }
-    discription = discription || ''
-    discription = discription.replace(/(\n)|(\snull)/g, '')
+    // 未拿到图片地址则跳过该 p 标签
+    if (!src) return;
 
-    const ext = src.split('.').pop()
+    let discription = $(pTag).last().text().replace(/(\n)|(\s)/g, '')
+    discription = discription && (' ' + discription)
 
-    let name = (`${page}-${picArr.length + 1} ` + discription).trim()
-    name = `${title}/${name}.${ext}`
+    const ext = '.' + src.split('.').pop()
+
+    const name = `${title}/${page}-${picArr.length + 1}` + discription + ext
 
     picArr.push({ src, name })
   })
 
   return picArr;
-  
-  
-  // const result = await sa.get(url).then(res => {
-  //   const $ = c.load(res.text)
-  //   const pics = Array.from($('p[align="center"]'))
-  //   const picArr = []
-    
-  //   pics.forEach(child => {
-  //     if (child.children[0].type !== 'tag') return;
-
-  //     let src = ''
-  //     switch (child.children[0].name) {
-  //       case 'img':
-  //         src = child.children[0].attribs.src
-  //         break;
-  //       case 'a':
-  //         src = child.children[0].attribs.href.split('?')[1]
-  //         break;
-  //     }
-
-  //     let discription = child.children.pop()
-  //     if (discription.type === 'text') {
-  //       discription = discription.data
-  //     } else {
-  //       discription = ''
-  //     }
-  //     discription = discription || ''
-  //     discription = discription.replace(/(\n)|(\snull)/g, '')
-  //     const name = (`${page}-${picArr.length + 1} ` + discription).trim()
-
-  //     picArr.push({ src, name })
-  //   })
-  //   return picArr;
-  // }).catch(err => [])
-
-  // return result;
 }
 
-module.exports = getPics
+module.exports = getPics;

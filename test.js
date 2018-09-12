@@ -7,7 +7,7 @@ const request = require('request')
 const checkDir = require('./checkDir')
 const log = console.log
 
-const url = 'https://www.gamersky.com/ent/201809/1097544_2.shtml'
+const url = 'https://www.gamersky.com/ent/201808/1083126_31.shtml'
 
 let title = ''
 
@@ -38,11 +38,10 @@ const test = async () => {
       title = '动图/' + title
     }
 
-    await checkDir(title)
   }
 
   const picArr = []
-  const pTags = $('.Mid2L_con>p')
+  const pTags = $('.Mid2L_con > p')
   // log(pics)
 
 
@@ -86,6 +85,7 @@ const test = async () => {
     // log($(pTag).last().text().replace(/(\n)|(\s)/g, ''))
 
   })
+  // log($('title').text())
 
   // pics.map(child => {
   //   log($('a', child).length)

@@ -16,7 +16,7 @@ const savePic = inf => new Promise((resolve, reject) => {
       reject(err)
     } else {
       console.log(name, '\nsuccess')
-      resolve()
+      resolve(name)
     }
   })
 })
@@ -25,4 +25,12 @@ const savePics = picArr => Promise.all(
   picArr.map(pic => savePic(pic))
 )
 
-module.exports = savePics
+const save = pics => {
+  if (Array.isArray(pics)) {
+    return savePics(pics);
+  } else if (typeof pics === 'object') {
+    return savePic(pics);
+  }
+}
+
+module.exports = save;
