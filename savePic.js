@@ -1,25 +1,21 @@
 const fs = require('fs')
-const mkdirp = require('mkdirp')
 const request = require('request')
-
-const dir = './pic4'
-
-mkdirp(dir, err => {
-  if (err) {
-    console.log(err)
-  }
-})
+const config = require('./config.json')
 
 const savePic = inf => new Promise((resolve, reject) => {
-  const ext = inf.src.split('.').pop()
-  const targetPath = `${dir}/${inf.name.replace(':', '：')}.${ext}`
+  if (!/\..{1,4}$/.test(inf.name)) {
+    const ext = inf.src.split('.').pop()
+    inf.name += ('.' + ext)
+  }
+  const targetPath = `${config.root}/${inf.name.replace(':', '：')}`
+  const name = targetPath.split('/').pop().split('.')[0]
   const stream = fs.createWriteStream(targetPath)
   request(inf.src).pipe(stream).on('close', err => {
     if (err) {
       console.log(err)
       reject(err)
     } else {
-      console.log(inf.name, '\nsuccess')
+      console.log(name, '\nsuccess')
       resolve()
     }
   })
