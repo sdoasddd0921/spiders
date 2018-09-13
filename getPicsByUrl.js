@@ -5,6 +5,34 @@ const { getPage } = require('./urlTools')
 
 let title = ''
 
+// 检查本地目标文件夹是否存在
+const checkTitle = async $ => {
+  if (title === '') {
+    const rawTitle = $('title').text()
+    title = rawTitle.replace(' _ 游民星空 GamerSky.com', '')
+
+    const indexes = [
+      { name: '囧图' },
+      { name: '动态图' },
+      {
+        name: '轻松一刻',
+        callback: title => title.replace('轻松一刻：', '')
+      }
+    ]
+    for (let i = 0, len = indexes.length; i < len; i++) {
+      if (title.indexOf(indexes[i].name) !== -1) {
+        if (typeof indexes[i].callback === 'function') {
+          title = indexes[i].callback(title)
+        }
+        title = indexes[i].name + '/' + title
+        break;
+      }
+    }
+
+    await checkDir(title)
+  }
+}
+
 const getPics = async url => {
   const picArr = []
   const page = getPage(url)
@@ -20,28 +48,7 @@ const getPics = async url => {
 
   if ($ === null) return picArr;
 
-  // 检查本地目标文件夹是否存在
-  if (title === '') {
-    const rawTitle = $('title').text()
-    title = rawTitle.replace(' _ 游民星空 GamerSky.com', '')
-
-    const indexes = [
-      '囧图',
-      '动态图',
-      '轻松一刻'
-    ]
-    for (let i = 0, len = indexes.length; i < len; i++) {
-      if (title.indexOf(indexes[i]) !== -1) {
-        if (indexes[i] === '轻松一刻') {
-          title = title.replace('轻松一刻：', '')
-        }
-        title = indexes[i] + '/' + title
-        break;
-      }
-    }
-
-    await checkDir(title)
-  }
+  await checkTitle($)
 
   let src = ''
   let discription = ''
