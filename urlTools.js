@@ -23,4 +23,4 @@ const getUrlByPage = page => {
   return newUrl;
 }
 
-module.exports = { getPage, getUrlByPage }
+module.exports = { getPage, getUrlByPage };

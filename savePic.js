@@ -7,7 +7,7 @@ const savePic = inf => new Promise((resolve, reject) => {
     const ext = inf.src.split('.').pop()
     inf.name += ('.' + ext)
   }
-  const targetPath = `${config.root}/${inf.name.replace(':', '：')}`
+  const targetPath = `${config.root || '.'}/${inf.name.replace(':', '：')}`
   const name = targetPath.split('/').pop().split('.')[0]
   const stream = fs.createWriteStream(targetPath)
   request(inf.src).pipe(stream).on('close', err => {

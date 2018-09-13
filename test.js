@@ -6,8 +6,9 @@ const mkdirp = require('mkdirp')
 const request = require('request')
 const checkDir = require('./checkDir')
 const log = console.log
+const rp = require('request-promise')
 
-const url = 'https://www.gamersky.com/ent/201808/1083126_31.shtml'
+const url = 'https://www.gamersky.com/ent/201808/1083126_131.shtml'
 
 let title = ''
 
@@ -85,27 +86,21 @@ const test = async () => {
     })
   }
   log(picArr)
-
-  // pTags.map((index, pTag) => {
-  //   const aTags = $(pTag).find('a')
-  //   // 因动态动图和静态图都有 img 标签，所以靠 a 标签区分
-  //   if (aTags.length > 0) {
-  //     // 真实图片地址为地址的参数
-  //     src = aTags.attr('href').split('?').pop()
-  //   } else {
-  //     src = $(pTag).find('img').attr('src')
-  //   }
-  //   // 未拿到图片地址则跳过该 p 标签
-  //   if (!src) return;
-
-  //   let discription = $(pTag).last().text().replace(/(\n)|(\s)/g, '')
-  //   discription = discription && (' ' + discription)
-
-  //   const ext = '.' + src.split('.').pop()
-
-  //   const name = `${title}/${page}-${picArr.length + 1}` + discription + ext
-
-  //   picArr.push({ src, name })
-  // })
 }
-test()
+// test()
+
+const rptest = async () => {
+  const options = {
+    uri: url,
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+    },
+    transform: body => c.load(body)
+};
+
+  const $ = await rp(options)
+    .then($ => $).catch(err => 'err')
+  log($)
+}
+
+rptest()

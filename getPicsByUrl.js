@@ -1,5 +1,5 @@
-const c = require('cheerio')
-const sa = require('superagent')
+const cheerio = require('cheerio')
+const rp = require('request-promise')
 const checkDir = require('./checkDir')
 const { getPage } = require('./urlTools')
 
@@ -8,23 +8,36 @@ let title = ''
 const getPics = async url => {
   const picArr = []
   const page = getPage(url)
+  const options = {
+    uri: url,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+    },
+    transform: body => cheerio.load(body)
+  }
 
-  const pageText = await sa.get(url)
-    .then(res => res.text)
-    .catch(() => null)
-  if (!pageText) return picArr;
+  const $ = await rp(options).catch(() => null)
 
-  const $ = c.load(pageText)
+  if ($ === null) return picArr;
 
   // 检查本地目标文件夹是否存在
   if (title === '') {
     const rawTitle = $('title').text()
     title = rawTitle.replace(' _ 游民星空 GamerSky.com', '')
 
-    if (title.indexOf('囧图') !== -1) {
-      title = '囧图/' + title
-    } else if (title.indexOf('动态图') !== -1) {
-      title = '动态图/' + title
+    const indexes = [
+      '囧图',
+      '动态图',
+      '轻松一刻'
+    ]
+    for (let i = 0, len = indexes.length; i < len; i++) {
+      if (title.indexOf(indexes[i]) !== -1) {
+        if (indexes[i] === '轻松一刻') {
+          title = title.replace('轻松一刻：', '')
+        }
+        title = indexes[i] + '/' + title
+        break;
+      }
     }
 
     await checkDir(title)
